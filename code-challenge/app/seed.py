@@ -24,7 +24,6 @@ guest_occupations = [
 
 def seed_data():
     with app.app_context():
-        # Create episodes
         episodes = []
         for i in range(1, 16):
             date_str = f'2023-01-{str(i).zfill(2)}'
