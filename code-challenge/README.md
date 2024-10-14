@@ -1,25 +1,19 @@
-# Flask Code Challenge - Late Show
 
-For this assessment, you'll be working with Late Night TV show domain.
+# Flask API Challenge - Models, Relationships, Validations, and Routes
 
-In this repo, there is a Flask application with some features built out. There
-is also a fully built React frontend application, so you can test if your API is
-working.
+## Overview
 
-Your job is to build out the Flask API to add the functionality described in the
-deliverables below.
+This project is a Flask API that manages Episodes, Guests, and Appearances. It showcases the implementation of models, relationships, validations, and routes using SQLAlchemy. You will create and manage data for these entities through the API.
 
 ## Setup
 
-To download the dependencies for the frontend and backend, run:
+To download the dependencies for the backend, run:
 
 ```sh
 pipenv install
-npm install --prefix client
 ```
 
-There is some starter code in the `app/seed.py` file so that once you've
-generated the models, you'll be able to create data to test your application.
+There is some starter code in the `app/seed.py` file that can help populate your database after you've set up the models and migrations.
 
 You can run your Flask API on [`localhost:5555`](http://localhost:5555) by running:
 
@@ -27,69 +21,47 @@ You can run your Flask API on [`localhost:5555`](http://localhost:5555) by runni
 python app.py
 ```
 
-You can run your React app on [`localhost:4000`](http://localhost:4000) by running:
+You can interact with the API via tools like Postman, cURL, or your preferred API client.
 
-```sh
-npm start --prefix client
-```
-
-You are not being assessed on React, and you don't have to update any of the React
-code; the frontend code is available just so that you can test out the behavior
-of your API in a realistic setting.
-
-There are also tests included which you can run using `pytest -x` to check your work.
-
-Depending on your preference, you can either check your progress by:
-
-- Running `pytest -x` and seeing if your code passes the tests
-- Running the React application in the browser and interacting with the API via
-  the frontend
-- Running the Flask server and using Postman to make requests
+There are also tests included, which you can run using `pytest -x` to check your work.
 
 ## Models
 
-The application keeps track of the guests that have appeared on the show.
+The API keeps track of guests that have appeared in various episodes of a show. There are three main models:
 
-There are three models in the domain: `Guest`, `Episode`, and `Appearance`.
+- `Guest`
+- `Episode`
+- `Appearance`
 
-You need to create the following relationships:
+### Relationships
 
-- An `Episode` has many `Guest`s through `Appearance`
-- A `Guest` has many `Episode`s through `Appearance`
-- An `Appearance` belongs to a `Guest` and belongs to an `Episode`
+- An `Episode` has many `Guests` through `Appearance`
+- A `Guest` has many `Episodes` through `Appearance`
+- An `Appearance` belongs to both a `Guest` and an `Episode`
 
-Start by creating the models and migrations for the following database tables:
+### Validations
 
-![domain diagram](domain.png)
+The `Appearance` model must validate:
 
-Add any code needed in the model files to establish the relationships.
+- `rating` between 1 and 5 (inclusive).
 
-Then, run the migrations and seed file:
+### Database Migrations
+
+After setting up your models and relationships, run the migrations and seed the database using the following commands:
 
 ```sh
-flask db revision --autogenerate -m'message'
+flask db revision --autogenerate -m 'message'
 flask db upgrade
 python app/seed.py
 ```
 
-> Note that this seed file uses a CSV file to populate the database. If you
-> aren't able to get the provided seed file working, you are welcome to generate
-> your own seed data to test the application.
-
-## Validations
-
-Add validations to the `Appearance` model:
-
-- must have a `rating` between 1 and 5 (inclusive - 1 and 5 are okay)
+If the provided seed file does not work, you can generate your own seed data for testing purposes.
 
 ## Routes
 
-Set up the following routes. Make sure to return JSON data in the format
-specified along with the appropriate HTTP verb.
-
 ### GET /episodes
 
-Return JSON data in the format below:
+Return JSON data of all episodes in the following format:
 
 ```json
 [
@@ -108,7 +80,7 @@ Return JSON data in the format below:
 
 ### GET /episodes/:id
 
-If the `Episode` exists, return JSON data in the format below:
+Return detailed information for a specific episode, including its guests:
 
 ```json
 {
@@ -130,8 +102,7 @@ If the `Episode` exists, return JSON data in the format below:
 }
 ```
 
-If the `Episode` does not exist, return the following JSON data, along with the
-appropriate HTTP status code:
+If the episode does not exist, return:
 
 ```json
 {
@@ -141,16 +112,7 @@ appropriate HTTP status code:
 
 ### DELETE /episodes/:id
 
-If the `Episode` exists, it should be removed from the database, along with any
-`Appearance`s that are associated with it (an `Appearance` belongs to an
-`Episode`, so you need to delete the `Appearance`s before the `Episode` can be
-deleted).
-
-After deleting the `Episode`, return an _empty_ response body, along with the
-appropriate HTTP status code.
-
-If the `Episode` does not exist, return the following JSON data, along with the
-appropriate HTTP status code:
+Delete an episode and any associated appearances. If successful, return an empty response. If the episode does not exist, return:
 
 ```json
 {
@@ -160,7 +122,7 @@ appropriate HTTP status code:
 
 ### GET /guests
 
-Return JSON data in the format below:
+Return JSON data of all guests:
 
 ```json
 [
@@ -179,9 +141,7 @@ Return JSON data in the format below:
 
 ### POST /appearances
 
-This route should create a new `Appearance` that is associated with an existing
-`Episode` and `Guest`. It should accept an object with the following properties
-in the body of the request:
+Create a new `Appearance` by associating an existing episode and guest, with a rating between 1 and 5. Request body:
 
 ```json
 {
@@ -191,8 +151,7 @@ in the body of the request:
 }
 ```
 
-If the `Appearance` is created successfully, send back a response with the
-following data:
+Successful response:
 
 ```json
 {
@@ -211,11 +170,15 @@ following data:
 }
 ```
 
-If the `Appearance` is **not** created successfully, return the following JSON
-data, along with the appropriate HTTP status code:
+If validation fails, return:
 
 ```json
 {
   "errors": ["validation errors"]
 }
 ```
+
+
+## Conclusion
+
+This API allows you to manage episodes, guests, and their appearances on a show, focusing on key features such as database relationships, data validation, and efficient route handling.
